@@ -5,9 +5,10 @@ interface Props {
   date: string;
   tags: string[];
   slug: string;
+  image?: string;
 }
 
-const { title, description, date, tags, slug } = Astro.props;
+const { title, description, date, tags, slug, image } = Astro.props;
 
 const formattedDate = new Date(date).toLocaleDateString('ko-KR', {
   year: 'numeric',
@@ -16,7 +17,12 @@ const formattedDate = new Date(date).toLocaleDateString('ko-KR', {
 });
 ---
 
-<a href={`/blog/${slug}`} class="card">
+<a href={`/blog/${slug}`} class:list={["card", { "has-image": !!image }]}>
+  {image && (
+    <div class="thumbnail">
+      <img src={image} alt={title} loading="lazy" />
+    </div>
+  )}
   <article>
     <div class="meta">
       <time datetime={date}>{formattedDate}</time>
@@ -40,10 +46,35 @@ const formattedDate = new Date(date).toLocaleDateString('ko-KR', {
     color: inherit;
   }
 
+  .card.has-image {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
   .card:hover {
     border-color: var(--accent);
     transform: translateY(-1px);
     opacity: 1;
+  }
+
+  .thumbnail {
+    flex-shrink: 0;
+    width: 160px;
+    height: 110px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  article {
+    flex: 1;
+    min-width: 0;
   }
 
   .meta {
@@ -85,5 +116,17 @@ const formattedDate = new Date(date).toLocaleDateString('ko-KR', {
     color: var(--text-muted);
     font-size: 0.9rem;
     line-height: 1.6;
+  }
+
+  @media (max-width: 640px) {
+    .card.has-image {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .thumbnail {
+      width: 100%;
+      height: 180px;
+    }
   }
 </style>
