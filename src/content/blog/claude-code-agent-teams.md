@@ -1,7 +1,7 @@
 ---
 title: "Claude Code 에이전트 팀: AI가 팀으로 코딩하는 시대"
 description: "Claude Code의 에이전트 팀 기능을 소개합니다. 여러 AI 에이전트가 독립적으로 작업하면서 서로 소통하고, 병렬로 개발하는 방법을 다룹니다."
-date: "2026-03-04"
+date: "2026-03-04T18:00:00"
 tags: ["claude-code", "ai", "에이전트"]
 draft: false
 ---

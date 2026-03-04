@@ -1,7 +1,7 @@
 ---
 title: "WSL + tmux 개발 환경 세팅 완전 정복 feat: Claude Code 에이전트 팀"
 description: "Windows에서 리눅스 개발 환경을 구축하고, tmux로 터미널을 효율적으로 관리하는 방법을 정리합니다."
-date: "2026-03-04"
+date: "2026-03-04T14:00:00"
 tags: ["개발환경", "wsl", "tmux", "claude-code"]
 draft: false
 ---
