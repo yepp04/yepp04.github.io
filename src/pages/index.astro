@@ -1,9 +1,126 @@
-<!doctype html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0;url=/blog" />
-    <link rel="canonical" href="/blog" />
-    <title>DEV.BLOG</title>
-  </head>
-</html>
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+---
+
+<BaseLayout title="DEV.BLOG">
+  <section class="blog-header">
+    <h1>Blog</h1>
+    <p>{posts.length}개의 글</p>
+  </section>
+
+  {allTags.length > 0 && (
+    <div class="tag-filter" id="tag-filter">
+      <button class="filter-tag active" data-tag="all">전체</button>
+      {allTags.map((tag) => (
+        <button class="filter-tag" data-tag={tag}>{tag}</button>
+      ))}
+    </div>
+  )}
+
+  <div class="post-list" id="post-list">
+    {posts.map((post) => (
+      <div class="post-item" data-tags={JSON.stringify(post.data.tags)}>
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          slug={post.id}
+        />
+      </div>
+    ))}
+  </div>
+
+  {posts.length === 0 && (
+    <p class="empty">아직 작성된 글이 없습니다.</p>
+  )}
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll('.filter-tag');
+  const items = document.querySelectorAll('.post-item');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tag = (btn as HTMLElement).dataset.tag;
+
+      buttons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      items.forEach((item) => {
+        const el = item as HTMLElement;
+        if (tag === 'all') {
+          el.style.display = '';
+        } else {
+          const tags: string[] = JSON.parse(el.dataset.tags || '[]');
+          el.style.display = tags.includes(tag!) ? '' : 'none';
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .blog-header {
+    margin-bottom: 2rem;
+  }
+
+  .blog-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .blog-header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .tag-filter {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .filter-tag {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .filter-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-tag.active {
+    background-color: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .post-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .empty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 4rem 0;
+  }
+</style>
