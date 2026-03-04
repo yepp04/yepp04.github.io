@@ -113,7 +113,7 @@ export const collections = { blog };
 
 - **제목**: Playfair Display — 세리프체로 글의 품격을 높임
 - **본문**: Noto Sans KR — 한국어 가독성 최고, 300/400/600 웨이트 활용
-- **코드**: JetBrains Mono — 개발자 블로그답게, 리가처 지원
+- **코드**: JetBrains Mono — 개발자 블로그에 어울리는 모노스페이스 폰트
 
 콘텐츠 영역의 최대 너비는 720px로 설정했습니다. 이는 한 줄에 약 45~75자가 들어가는 최적의 가독성 범위입니다.
 
