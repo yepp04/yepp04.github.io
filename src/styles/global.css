@@ -44,6 +44,64 @@ a:hover {
   opacity: 0.8;
 }
 
+/* Header - global.css에서 관리하여 페이지 간 일관성 보장 */
+header.site-header {
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background-color: var(--bg);
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+header.site-header nav {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header.site-header .logo {
+  font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
+  opacity: 1;
+}
+
+header.site-header .logo:hover {
+  opacity: 1;
+}
+
+header.site-header .nav-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+header.site-header .nav-links a {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-decoration: none;
+  line-height: 1.5;
+  transition: color 0.2s;
+  opacity: 1;
+}
+
+header.site-header .nav-links a:hover,
+header.site-header .nav-links a.active {
+  color: var(--text);
+  opacity: 1;
+}
+
 h1, h2, h3, h4 {
   font-family: 'Playfair Display', 'Noto Sans KR', serif;
   font-weight: 700;
