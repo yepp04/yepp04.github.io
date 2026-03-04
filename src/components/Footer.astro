@@ -1,0 +1,23 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <p>&copy; {year} DEV.BLOG. All rights reserved.</p>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  p {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+</style>

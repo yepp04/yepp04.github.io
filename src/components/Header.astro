@@ -1,0 +1,56 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
+<header>
+  <nav>
+    <a href="/blog" class="logo">DEV.BLOG</a>
+    <div class="nav-links">
+      <a href="/blog" class:list={[{ active: currentPath.startsWith('/blog') }]}>Blog</a>
+      <a href="https://github.com/yepp04" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background-color: var(--bg);
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+
+  nav {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--text);
+  }
+</style>

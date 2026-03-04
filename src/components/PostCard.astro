@@ -1,0 +1,89 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+  slug: string;
+}
+
+const { title, description, date, tags, slug } = Astro.props;
+
+const formattedDate = new Date(date).toLocaleDateString('ko-KR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<a href={`/blog/${slug}`} class="card">
+  <article>
+    <div class="meta">
+      <time datetime={date}>{formattedDate}</time>
+      <div class="tags">
+        {tags.map((tag) => <span class="tag">{tag}</span>)}
+      </div>
+    </div>
+    <h2>{title}</h2>
+    <p>{description}</p>
+  </article>
+</a>
+
+<style>
+  .card {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg-card);
+    transition: border-color 0.2s, transform 0.2s;
+    color: inherit;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  time {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    color: var(--accent);
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--accent);
+    border-radius: 9999px;
+    opacity: 0.7;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+</style>
