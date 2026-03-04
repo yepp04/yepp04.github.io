@@ -9,7 +9,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 ---
 
-<BaseLayout title="DEV.BLOG">
+<BaseLayout title="깃냥이.DEV">
   <section class="blog-header">
     <h1>Blog</h1>
     <p>{posts.length}개의 글</p>

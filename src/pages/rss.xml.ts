@@ -7,8 +7,8 @@ export async function GET(context: APIContext) {
     .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
   return rss({
-    title: 'DEV.BLOG',
-    description: '프론트엔드 개발자의 기술 블로그',
+    title: '깃냥이.DEV',
+    description: '깃냥이의 개발 블로그',
     site: context.site!,
     items: posts.map((post) => ({
       title: post.data.title,
