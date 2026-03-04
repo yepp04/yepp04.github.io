@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="연락처 | 깃냥이.DEV" description="깃냥이에게 연락하기">
+  <article class="contact-page">
+    <h1>연락처</h1>
+
+    <section class="contact-intro">
+      <p>궁금한 점이나 함께 이야기 나누고 싶은 주제가 있다면 언제든 연락 주세요.</p>
+    </section>
+
+    <section class="contact-methods">
+      <div class="contact-item">
+        <h2>GitHub</h2>
+        <p>
+          <a href="https://github.com/yepp04" target="_blank" rel="noopener noreferrer">
+            github.com/yepp04
+          </a>
+        </p>
+        <p class="description">이슈나 PR을 통해 연락하실 수 있습니다.</p>
+      </div>
+
+      <div class="contact-item">
+        <h2>이메일</h2>
+        <p class="description">
+          GitHub 프로필을 통해 연락해주세요.
+        </p>
+      </div>
+
+      <div class="contact-item">
+        <h2>포트폴리오</h2>
+        <p>
+          <a href="https://jinseong.dev" target="_blank" rel="noopener noreferrer">
+            jinseong.dev
+          </a>
+        </p>
+        <p class="description">더 자세한 정보와 프로젝트를 확인할 수 있습니다.</p>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .contact-page {
+    max-width: 100%;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--text);
+  }
+
+  section {
+    margin-bottom: 3rem;
+  }
+
+  .contact-intro p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
+
+  .contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .contact-item {
+    padding: 1.5rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .contact-item:hover {
+    border-color: var(--accent);
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+
+  p {
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  .description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>

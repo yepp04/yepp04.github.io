@@ -18,6 +18,24 @@ const formattedDate = new Date(date).toLocaleDateString('ko-KR', {
 ---
 
 <BaseLayout title={`${title} | 깃냥이.DEV`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": title,
+    "description": description,
+    "datePublished": date,
+    "author": {
+      "@type": "Person",
+      "name": "깃냥이",
+      "url": "https://jinseong.dev"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "깃냥이.DEV",
+      "url": "https://yepp04.github.io"
+    },
+    "keywords": tags.join(", ")
+  })} />
   <article>
     <header class="post-header">
       <div class="post-meta">

@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="소개 | 깃냥이.DEV" description="깃냥이.DEV 블로그 소개">
+  <article class="about-page">
+    <h1>소개</h1>
+
+    <section class="intro">
+      <p>안녕하세요, 깃냥이입니다.</p>
+      <p>
+        이 블로그는 개발하면서 배우고 경험한 것들을 기록하고 공유하는 공간입니다.
+        문제를 해결하는 과정, 새로운 기술을 탐구한 이야기, 그리고 개발 도구와 워크플로우에 대한
+        생각들을 정리하고 있습니다.
+      </p>
+    </section>
+
+    <section class="interests">
+      <h2>관심 분야</h2>
+      <ul>
+        <li>웹 개발 (프론트엔드 & 백엔드)</li>
+        <li>클라우드 인프라스트럭처</li>
+        <li>AI/ML 응용</li>
+        <li>개발 도구 및 생산성</li>
+      </ul>
+    </section>
+
+    <section class="links">
+      <h2>더 알아보기</h2>
+      <p>
+        더 자세한 소개와 진행했던 프로젝트들은
+        <a href="https://jinseong.dev" target="_blank" rel="noopener noreferrer">jinseong.dev</a>에서
+        확인하실 수 있습니다.
+      </p>
+    </section>
+
+    <section class="tech-stack">
+      <h2>블로그 기술 스택</h2>
+      <p>
+        이 블로그는 <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a>로 만들어졌으며,
+        <a href="https://pages.github.com" target="_blank" rel="noopener noreferrer">GitHub Pages</a>를 통해 배포되고 있습니다.
+      </p>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .about-page {
+    max-width: 100%;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--text);
+  }
+
+  section {
+    margin-bottom: 3rem;
+  }
+
+  section:last-child {
+    margin-bottom: 0;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  p {
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--text);
+  }
+
+  li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  a:hover {
+    opacity: 0.8;
+  }
+
+  .intro p:first-child {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+</style>

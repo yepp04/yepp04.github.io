@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="페이지를 찾을 수 없습니다 | 깃냥이.DEV" description="요청하신 페이지가 존재하지 않거나 이동되었습니다.">
+  <div class="not-found-container">
+    <div class="not-found-content">
+      <h1 class="error-code">404</h1>
+      <h2 class="error-title">페이지를 찾을 수 없습니다</h2>
+      <p class="error-description">요청하신 페이지가 존재하지 않거나 이동되었습니다.</p>
+      <a href="/blog" class="back-link">블로그로 돌아가기</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    width: 100%;
+  }
+
+  .not-found-content {
+    text-align: center;
+    max-width: 600px;
+    padding: 2rem;
+  }
+
+  .error-code {
+    font-size: 7rem;
+    font-weight: 900;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .error-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 1.5rem 0 1rem;
+    padding: 0;
+  }
+
+  .error-description {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin: 0 0 2rem;
+    line-height: 1.6;
+  }
+
+  .back-link {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    background-color: var(--accent);
+    color: var(--bg);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+  }
+
+  .back-link:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+  }
+
+  .back-link:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 640px) {
+    .not-found-container {
+      min-height: 50vh;
+      padding: 2rem 0;
+    }
+
+    .error-code {
+      font-size: 5rem;
+    }
+
+    .error-title {
+      font-size: 1.5rem;
+    }
+
+    .error-description {
+      font-size: 1rem;
+    }
+  }
+</style>
