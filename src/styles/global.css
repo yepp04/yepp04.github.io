@@ -19,6 +19,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -30,6 +31,7 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 a {
@@ -62,6 +64,8 @@ img {
   font-size: 1rem;
   line-height: 1.8;
   color: var(--text);
+  overflow-wrap: break-word;
+  word-break: keep-all;
 }
 
 .prose h2 {
