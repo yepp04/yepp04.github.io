@@ -8,7 +8,6 @@ const currentPath = Astro.url.pathname;
     <div class="nav-links">
       <a href="/blog" class:list={[{ active: currentPath.startsWith('/blog') }]}>Blog</a>
       <a href="/about" class:list={[{ active: currentPath.startsWith('/about') }]}>About</a>
-      <a href="/contact" class:list={[{ active: currentPath.startsWith('/contact') }]}>Contact</a>
       <a href="https://github.com/yepp04" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
   </nav>
