@@ -26,3 +26,4 @@ pnpm-debug.log*
 # AI agent documentation
 AGENTS.md
 **/AGENTS.md
+.omc
