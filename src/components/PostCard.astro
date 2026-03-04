@@ -36,13 +36,12 @@ const formattedDate = new Date(date).toLocaleDateString('ko-KR', {
     border: 1px solid var(--border);
     border-radius: 8px;
     background-color: var(--bg-card);
-    transition: border-color 0.2s, transform 0.2s;
+    transition: border-color 0.2s;
     color: inherit;
   }
 
   .card:hover {
     border-color: var(--accent);
-    transform: translateY(-2px);
     opacity: 1;
   }
 
