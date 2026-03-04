@@ -3,8 +3,11 @@ title: "Astro로 GitHub Pages 블로그 만들기"
 description: "정적 사이트 생성기 Astro를 활용해 GitHub Pages에 기술 블로그를 구축한 과정을 공유합니다."
 date: "2026-03-04T10:00:00"
 tags: ["astro", "블로그", "github-pages"]
+image: "/images/hello-world.webp"
 draft: false
 ---
+
+![Astro로 GitHub Pages 블로그 만들기](/images/hello-world.webp)
 
 ## 블로그를 만들게 된 계기
 
