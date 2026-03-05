@@ -3,11 +3,8 @@ title: "2026년 AI 모델 비교: ChatGPT vs Claude vs Gemini"
 description: "GPT-5, Claude Opus/Sonnet 4.6, Gemini 2.5 등 2026년 주요 AI 모델을 개발자 관점에서 비교합니다."
 date: "2026-03-05T12:00:00"
 tags: ["ai", "chatgpt", "claude", "gemini", "개발도구"]
-image: "/images/ai-comparison.webp"
 draft: false
 ---
-
-![2026년 AI 모델 비교](/images/ai-comparison.webp)
 
 ## 들어가며
 
