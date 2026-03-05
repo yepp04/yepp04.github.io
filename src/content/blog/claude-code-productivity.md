@@ -3,11 +3,9 @@ title: "Claude Code로 개발 생산성 높이기"
 description: "터미널 기반 AI 코딩 도구 Claude Code의 특징과, 실제 개발에서 생산성을 높이는 활용법을 정리합니다."
 date: "2026-03-05T10:00:00"
 tags: ["claude-code", "ai", "생산성", "개발도구"]
-image: "/images/claude-code.webp"
 draft: false
 ---
 
-![Claude Code로 개발 생산성 높이기](/images/claude-code.webp)
 
 ## Claude Code란?
 
