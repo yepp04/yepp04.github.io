@@ -109,9 +109,11 @@ Stitch에서 만든 HTML + 스크린샷을 다운로드해서 Claude의 **스킬
 
 ## 4. Front-end Design Skill 활용
 
-X(Twitter)에서 235,000+ 뷰를 기록한 바이럴 포스트에서 소개된 **front-end design skill**도 강력한 도구입니다.
+Claude Code에는 [스킬(Skill)](https://docs.anthropic.com/en/docs/claude-code/skills) 시스템이 있습니다. 특정 작업에 대한 지침을 마크다운 파일로 정의해두면, Claude가 관련 작업을 할 때 자동으로 참조하는 기능입니다. 일종의 재사용 가능한 프롬프트 템플릿이라고 보면 됩니다.
 
-Claude Code에 이 스킬을 설치하면:
+이 중 X(Twitter)에서 235,000+ 뷰를 기록하며 화제가 된 **front-end design skill**이 있습니다. "generic AI aesthetics를 피하고 프로덕션 수준의 UI를 만들어라"는 디자인 원칙이 담긴 스킬입니다. 설치는 Claude Code에서 마켓플레이스를 추가한 뒤 플러그인으로 설치하면 됩니다.
+
+이 스킬을 적용하면:
 
 - **블랙, 화이트, 원 컬러** 사용 (좋은 디자인의 기본)
 - 스크롤 시 글로우 효과, 페이드인 애니메이션, 호버 이펙트
