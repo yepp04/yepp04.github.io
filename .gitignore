@@ -23,6 +23,9 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# planning docs
+adsense-optimization-plan.md
+
 # AI agent documentation
 AGENTS.md
 **/AGENTS.md
