@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://yepp04.github.io',
+  trailingSlash: 'always',
   integrations: [sitemap()],
   markdown: {
     shikiConfig: {
