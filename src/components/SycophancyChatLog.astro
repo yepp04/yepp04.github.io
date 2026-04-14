@@ -1,0 +1,702 @@
+---
+import { TURNS } from './sycophancy-turns';
+
+interface Props {
+  imageUrl?: string;
+  imageAlt?: string;
+  imageCaption?: string;
+}
+
+const {
+  imageUrl,
+  imageAlt = 'ChatGPT 대화 시작 이미지',
+  imageCaption = "Jonas Čeika @Jonas_Ceika\nChatGPT한테 방구 소리 효과음을 모아둔 오디오 파일을 보내고 '내 음악'에 대해 어떻게 생각하는지 물어봤더니 이렇게 대답했어",
+} = Astro.props;
+
+const LONG_THRESHOLD = 600;
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function renderInline(text: string): string {
+  const escaped = escapeHtml(text);
+  return escaped
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="syc-md-strong">$1</strong>')
+    .replace(/`(.+?)`/g, '<code class="syc-md-code">$1</code>')
+    .replace(/\n/g, '<br />');
+}
+
+function renderMarkdown(text: string): string {
+  const lines = text.split('\n');
+  const out: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (line.trim() === '') {
+      i++;
+      continue;
+    }
+
+    const headingMatch = line.match(/^(#{1,3})\s+(.*)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      const tag = level === 1 ? 'h3' : level === 2 ? 'h4' : 'h5';
+      out.push(
+        `<${tag} class="syc-md-h syc-md-h${level}">${renderInline(headingMatch[2])}</${tag}>`
+      );
+      i++;
+      continue;
+    }
+
+    if (/^---+$/.test(line.trim())) {
+      out.push('<hr class="syc-md-hr" />');
+      i++;
+      continue;
+    }
+
+    if (line.startsWith('>')) {
+      const quoteLines: string[] = [];
+      while (i < lines.length && lines[i].startsWith('>')) {
+        quoteLines.push(lines[i].replace(/^>\s?/, ''));
+        i++;
+      }
+      const inner = quoteLines
+        .map((ql) => `<p class="syc-md-bq-p">${renderInline(ql)}</p>`)
+        .join('');
+      out.push(`<blockquote class="syc-md-bq">${inner}</blockquote>`);
+      continue;
+    }
+
+    if (/^[-*]\s/.test(line.trim())) {
+      const items: { text: string; sub: string[] }[] = [];
+      while (i < lines.length && /^[-*]\s/.test(lines[i].trim())) {
+        const itemText = lines[i].trim().replace(/^[-*]\s/, '');
+        i++;
+        const subItems: string[] = [];
+        while (i < lines.length && /^\s+[-*]\s/.test(lines[i])) {
+          subItems.push(lines[i].trim().replace(/^[-*]\s/, ''));
+          i++;
+        }
+        items.push({ text: itemText, sub: subItems });
+      }
+      const html =
+        '<ul class="syc-md-ul">' +
+        items
+          .map((item) => {
+            const subHtml = item.sub.length
+              ? `<ul class="syc-md-ul syc-md-ul-sub">${item.sub
+                  .map((s) => `<li class="syc-md-li">${renderInline(s)}</li>`)
+                  .join('')}</ul>`
+              : '';
+            return `<li class="syc-md-li">${renderInline(item.text)}${subHtml}</li>`;
+          })
+          .join('') +
+        '</ul>';
+      out.push(html);
+      continue;
+    }
+
+    if (/^\d+\.\s/.test(line.trim())) {
+      const items: { text: string; sub: string[] }[] = [];
+      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
+        const itemText = lines[i].trim().replace(/^\d+\.\s/, '');
+        i++;
+        const subItems: string[] = [];
+        while (i < lines.length && /^\s+[-*]\s/.test(lines[i])) {
+          subItems.push(lines[i].trim().replace(/^[-*]\s/, ''));
+          i++;
+        }
+        items.push({ text: itemText, sub: subItems });
+      }
+      const html =
+        '<ol class="syc-md-ol">' +
+        items
+          .map((item) => {
+            const subHtml = item.sub.length
+              ? `<ul class="syc-md-ul syc-md-ul-sub">${item.sub
+                  .map((s) => `<li class="syc-md-li">${renderInline(s)}</li>`)
+                  .join('')}</ul>`
+              : '';
+            return `<li class="syc-md-li">${renderInline(item.text)}${subHtml}</li>`;
+          })
+          .join('') +
+        '</ol>';
+      out.push(html);
+      continue;
+    }
+
+    const paraLines = [line];
+    i++;
+    while (
+      i < lines.length &&
+      lines[i].trim() !== '' &&
+      !/^#{1,3}\s/.test(lines[i]) &&
+      !/^---/.test(lines[i].trim()) &&
+      !/^>/.test(lines[i]) &&
+      !/^[-*]\s/.test(lines[i].trim()) &&
+      !/^\d+\.\s/.test(lines[i].trim())
+    ) {
+      paraLines.push(lines[i]);
+      i++;
+    }
+    out.push(`<p class="syc-md-p">${renderInline(paraLines.join('\n'))}</p>`);
+  }
+
+  return out.join('');
+}
+
+const totalTurns = Math.ceil(TURNS.length / 2);
+
+const turns = TURNS.map((turn, idx) => ({
+  ...turn,
+  idx,
+  turnNumber: Math.ceil((idx + 1) / 2),
+  isLong: turn.role === 'assistant' && turn.content.length > LONG_THRESHOLD,
+  html: turn.role === 'assistant' ? renderMarkdown(turn.content) : '',
+}));
+---
+
+<div class="syc-root">
+  <div class="syc-header">
+    <div class="syc-header-brand">
+      <span class="syc-avatar-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"
+            fill="currentColor"></path>
+        </svg>
+      </span>
+      <div class="syc-header-text">
+        <div class="syc-header-title">ChatGPT</div>
+        <div class="syc-header-sub">GPT-5 · Sycophancy 라이브 데모</div>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="syc-toggle-all"
+      data-action="toggle-all"
+      data-expanded="false"
+    >
+      응답 모두 펼치기
+    </button>
+  </div>
+
+  <div class="syc-chat">
+    {
+      turns.map((turn) =>
+        turn.role === 'user' ? (
+          <div class="syc-row syc-row-user">
+            <div class="syc-user-col">
+              {turn.hasImage && (
+                <div class="syc-image-wrapper">
+                  {imageUrl ? (
+                    <img src={imageUrl} alt={imageAlt} class="syc-image" loading="lazy" />
+                  ) : (
+                    <div class="syc-image-placeholder">
+                      <div class="syc-image-icon" aria-hidden="true">🖼️</div>
+                      <div class="syc-image-caption">
+                        {imageCaption.split('\n').map((l, i) => (
+                          <div>{l}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              <div class="syc-bubble">{turn.content}</div>
+            </div>
+          </div>
+        ) : (
+          <div
+            class="syc-row syc-row-assistant"
+            data-idx={String(turn.idx)}
+            data-long={turn.isLong ? 'true' : 'false'}
+          >
+            <div class="syc-avatar" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <div class="syc-content">
+              <div class="syc-response" set:html={turn.html} />
+              {turn.isLong && (
+                <div class="syc-fade">
+                  <button
+                    type="button"
+                    class="syc-toggle-turn"
+                    data-action="toggle-turn"
+                    data-idx={String(turn.idx)}
+                  >
+                    더 보기 ↓
+                  </button>
+                </div>
+              )}
+              {turn.isLong && (
+                <div class="syc-collapse-wrap">
+                  <button
+                    type="button"
+                    class="syc-toggle-turn syc-toggle-collapse"
+                    data-action="toggle-turn"
+                    data-idx={String(turn.idx)}
+                  >
+                    접기 ↑
+                  </button>
+                </div>
+              )}
+              <div class="syc-turn-meta">
+                Turn {turn.turnNumber}/{totalTurns}
+              </div>
+            </div>
+          </div>
+        )
+      )
+    }
+  </div>
+
+  <div class="syc-footer">
+    이 대화는 AI sycophancy의 실시간 작동을 보여주는 케이스 스터디입니다.<br />
+    GPT-5 · 2026년 4월
+  </div>
+</div>
+
+<script>
+  function initChatLog() {
+    const roots = document.querySelectorAll<HTMLElement>('.syc-root');
+    roots.forEach((root) => {
+      root.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const btn = target.closest<HTMLElement>('[data-action]');
+        if (!btn || !root.contains(btn)) return;
+
+        const action = btn.dataset.action;
+
+        if (action === 'toggle-turn') {
+          const idx = btn.dataset.idx;
+          if (!idx) return;
+          const row = root.querySelector<HTMLElement>(
+            `.syc-row-assistant[data-idx="${idx}"]`
+          );
+          if (row) row.classList.toggle('syc-expanded');
+          return;
+        }
+
+        if (action === 'toggle-all') {
+          const longRows = root.querySelectorAll<HTMLElement>(
+            '.syc-row-assistant[data-long="true"]'
+          );
+          if (!longRows.length) return;
+          const currentlyExpanded = btn.dataset.expanded === 'true';
+          const next = !currentlyExpanded;
+          longRows.forEach((r) => r.classList.toggle('syc-expanded', next));
+          btn.dataset.expanded = String(next);
+          btn.textContent = next ? '응답 접기' : '응답 모두 펼치기';
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChatLog);
+  } else {
+    initChatLog();
+  }
+</script>
+
+<style is:global>
+  .syc-root {
+    --syc-bg: #212121;
+    --syc-bg-surface: #2f2f2f;
+    --syc-bg-bubble: #303030;
+    --syc-text: #ececec;
+    --syc-text-muted: #b4b4b4;
+    --syc-text-dim: #8e8e8e;
+    --syc-border: rgba(255, 255, 255, 0.08);
+    --syc-border-strong: rgba(255, 255, 255, 0.16);
+    --syc-code-bg: rgba(255, 255, 255, 0.08);
+    --syc-fade: linear-gradient(to bottom, rgba(33, 33, 33, 0) 0%, #212121 70%);
+
+    position: relative;
+    background: var(--syc-bg);
+    color: var(--syc-text);
+    border-radius: 12px;
+    border: 1px solid var(--syc-border);
+    font-family: 'Söhne', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.935rem;
+    line-height: 1.65;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .syc-root *,
+  .syc-root *::before,
+  .syc-root *::after {
+    box-sizing: border-box;
+  }
+
+  .syc-header {
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--syc-border);
+    background: var(--syc-bg);
+  }
+
+  .syc-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .syc-avatar-icon,
+  .syc-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--syc-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--syc-text);
+    flex-shrink: 0;
+  }
+
+  .syc-header-text {
+    min-width: 0;
+  }
+
+  .syc-header-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--syc-text);
+    line-height: 1.3;
+  }
+
+  .syc-header-sub {
+    font-size: 0.72rem;
+    color: var(--syc-text-dim);
+    line-height: 1.3;
+  }
+
+  .syc-toggle-all {
+    appearance: none;
+    background: var(--syc-bg-bubble);
+    border: 1px solid var(--syc-border);
+    color: var(--syc-text-muted);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    flex-shrink: 0;
+  }
+
+  .syc-toggle-all:hover {
+    background: var(--syc-border-strong);
+    color: var(--syc-text);
+  }
+
+  .syc-chat {
+    padding: 20px 16px 8px;
+  }
+
+  .syc-row {
+    margin: 20px 0;
+  }
+
+  .syc-row:first-child {
+    margin-top: 0;
+  }
+
+  .syc-row-user {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .syc-user-col {
+    max-width: 80%;
+    min-width: 0;
+  }
+
+  .syc-bubble {
+    background: var(--syc-bg-bubble);
+    border-radius: 22px 22px 4px 22px;
+    padding: 12px 18px;
+    color: var(--syc-text);
+    font-size: 0.93rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: keep-all;
+  }
+
+  .syc-image-wrapper {
+    margin-bottom: 8px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--syc-border);
+    background: #1a1a1a;
+    max-width: 360px;
+    margin-left: auto;
+  }
+
+  .syc-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .syc-image-placeholder {
+    padding: 18px;
+    color: var(--syc-text-dim);
+    font-size: 0.78rem;
+    text-align: center;
+    line-height: 1.55;
+  }
+
+  .syc-image-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .syc-image-caption div {
+    margin-top: 2px;
+  }
+
+  .syc-image-caption div:first-child {
+    font-weight: 500;
+    color: var(--syc-text-muted);
+    margin-bottom: 4px;
+  }
+
+  .syc-row-assistant {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .syc-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .syc-response {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .syc-row-assistant[data-long='true'] .syc-response {
+    max-height: 260px;
+    transition: max-height 0.45s ease;
+  }
+
+  .syc-row-assistant.syc-expanded .syc-response {
+    max-height: 20000px;
+  }
+
+  .syc-fade {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 90px;
+    background: var(--syc-fade);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4px;
+    pointer-events: none;
+  }
+
+  .syc-fade .syc-toggle-turn {
+    pointer-events: auto;
+  }
+
+  .syc-row-assistant[data-long='true'] .syc-content {
+    position: relative;
+  }
+
+  .syc-row-assistant:not([data-long='true']) .syc-fade,
+  .syc-row-assistant:not([data-long='true']) .syc-collapse-wrap,
+  .syc-row-assistant.syc-expanded .syc-fade {
+    display: none;
+  }
+
+  .syc-collapse-wrap {
+    text-align: center;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .syc-row-assistant.syc-expanded .syc-collapse-wrap {
+    display: block;
+  }
+
+  .syc-toggle-turn {
+    appearance: none;
+    background: var(--syc-bg-bubble);
+    border: 1px solid var(--syc-border);
+    color: var(--syc-text-muted);
+    padding: 5px 16px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+
+  .syc-toggle-turn:hover {
+    background: var(--syc-border-strong);
+    color: var(--syc-text);
+  }
+
+  .syc-turn-meta {
+    font-size: 0.7rem;
+    color: var(--syc-text-dim);
+    margin-top: 10px;
+  }
+
+  .syc-footer {
+    text-align: center;
+    padding: 26px 16px 28px;
+    border-top: 1px solid var(--syc-border);
+    color: var(--syc-text-dim);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    margin-top: 8px;
+  }
+
+  .syc-md-h {
+    font-family: inherit;
+    font-weight: 600;
+    margin: 1.15em 0 0.5em;
+    color: var(--syc-text);
+    line-height: 1.4;
+    border: none;
+    padding: 0;
+  }
+
+  .syc-md-h1 {
+    font-size: 1.05rem;
+  }
+
+  .syc-md-h2 {
+    font-size: 1rem;
+  }
+
+  .syc-md-h3 {
+    font-size: 0.95rem;
+  }
+
+  .syc-md-p {
+    margin: 0.6em 0;
+    color: var(--syc-text);
+    line-height: 1.7;
+    overflow-wrap: break-word;
+    word-break: keep-all;
+  }
+
+  .syc-md-p:first-child {
+    margin-top: 0;
+  }
+
+  .syc-md-strong {
+    font-weight: 600;
+    color: var(--syc-text);
+  }
+
+  .syc-md-code {
+    background: var(--syc-code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.88em;
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', ui-monospace, monospace;
+    color: var(--syc-text);
+    border: none;
+  }
+
+  .syc-md-hr {
+    border: none;
+    border-top: 1px solid var(--syc-border);
+    margin: 1em 0;
+  }
+
+  .syc-md-bq {
+    border-left: 3px solid var(--syc-text-dim);
+    padding: 0 0 0 1em;
+    margin: 0.8em 0;
+    color: var(--syc-text-muted);
+    font-style: normal;
+    background: none;
+  }
+
+  .syc-md-bq-p {
+    margin: 0.25em 0;
+    line-height: 1.6;
+  }
+
+  .syc-md-ul,
+  .syc-md-ol {
+    margin: 0.6em 0;
+    padding-left: 1.5em;
+  }
+
+  .syc-md-ul-sub {
+    margin: 0.25em 0 0.25em;
+  }
+
+  .syc-md-li {
+    margin: 0.3em 0;
+    line-height: 1.65;
+    color: var(--syc-text);
+  }
+
+  @media (max-width: 600px) {
+    .syc-root {
+      font-size: 0.9rem;
+    }
+
+    .syc-chat {
+      padding: 16px 12px 4px;
+    }
+
+    .syc-header {
+      padding: 10px 14px;
+    }
+
+    .syc-header-sub {
+      font-size: 0.68rem;
+    }
+
+    .syc-bubble {
+      padding: 10px 14px;
+      font-size: 0.9rem;
+    }
+
+    .syc-user-col {
+      max-width: 88%;
+    }
+
+    .syc-row-assistant {
+      gap: 8px;
+    }
+
+    .syc-footer {
+      padding: 20px 12px 22px;
+      font-size: 0.72rem;
+    }
+  }
+</style>
